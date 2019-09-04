@@ -2,10 +2,11 @@ package network
 
 import (
 	"errors"
-	"github.com/gorilla/websocket"
-	"github.com/shinjuwu/leaf/log"
 	"net"
 	"sync"
+
+	"github.com/gorilla/websocket"
+	"github.com/shinjuwu/leaf/log"
 )
 
 type WebsocketConnSet map[*websocket.Conn]struct{}
@@ -30,7 +31,7 @@ func newWSConn(conn *websocket.Conn, pendingWriteNum int, maxMsgLen uint32) *WSC
 				break
 			}
 
-			err := conn.WriteMessage(websocket.BinaryMessage, b)
+			err := conn.WriteMessage(websocket.TextMessage, b)
 			if err != nil {
 				break
 			}
