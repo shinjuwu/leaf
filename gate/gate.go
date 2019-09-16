@@ -85,6 +85,7 @@ func (gate *Gate) Run(closeSig chan bool) {
 func (gate *Gate) OnDestroy() {}
 
 type agent struct {
+	agentID  int64
 	conn     network.Conn
 	gate     *Gate
 	userData interface{}
@@ -158,4 +159,12 @@ func (a *agent) UserData() interface{} {
 
 func (a *agent) SetUserData(data interface{}) {
 	a.userData = data
+}
+
+func (a *agent) SetAgentID(id int64) {
+	a.agentID = id
+}
+
+func (a *agent) GetAgentID() int64 {
+	return a.agentID
 }
