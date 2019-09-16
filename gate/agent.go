@@ -12,6 +12,6 @@ type Agent interface {
 	Destroy()
 	UserData() interface{}
 	SetUserData(data interface{})
-	SetAgentID()
+	SetAgentID(id int64)
 	GetAgentID() int64
 }
