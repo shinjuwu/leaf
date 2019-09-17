@@ -89,6 +89,7 @@ type agent struct {
 	conn     network.Conn
 	gate     *Gate
 	userData interface{}
+	session  Session
 }
 
 func (a *agent) Run() {
