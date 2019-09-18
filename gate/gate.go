@@ -1,12 +1,9 @@
 package gate
 
 import (
-	"net"
-	"reflect"
 	"time"
 
 	"github.com/shinjuwu/leaf/chanrpc"
-	"github.com/shinjuwu/leaf/log"
 	"github.com/shinjuwu/leaf/network"
 )
 
@@ -27,6 +24,13 @@ type Gate struct {
 	TCPAddr      string
 	LenMsgLen    int
 	LittleEndian bool
+
+	//extension
+	// handler        GateHandler
+	agentLearner   AgentLearner
+	sessionLearner SessionLearner
+	storage        StorageHandler
+	//tracing        TracingHandler
 }
 
 func (gate *Gate) Run(closeSig chan bool) {
@@ -82,90 +86,38 @@ func (gate *Gate) Run(closeSig chan bool) {
 	}
 }
 
-func (gate *Gate) OnDestroy() {}
+func (gate *Gate) OnDestroy() {
 
-type agent struct {
-	agentID  int64
-	conn     network.Conn
-	gate     *Gate
-	userData interface{}
-	session  Session
 }
 
-func (a *agent) Run() {
-	for {
-		data, err := a.conn.ReadMsg()
-		if err != nil {
-			log.Debug("read message: %v", err)
-			break
-		}
-
-		if a.gate.Processor != nil {
-			msg, err := a.gate.Processor.Unmarshal(data)
-			if err != nil {
-				log.Debug("unmarshal message error: %v", err)
-				break
-			}
-			err = a.gate.Processor.Route(msg, a)
-			if err != nil {
-				log.Debug("route message error: %v", err)
-				break
-			}
-		}
-	}
+func (this *Gate) GetStorageHandler() (storage StorageHandler) {
+	return this.storage
 }
 
-func (a *agent) OnClose() {
-	if a.gate.AgentChanRPC != nil {
-		err := a.gate.AgentChanRPC.Call0("CloseAgent", a)
-		if err != nil {
-			log.Error("chanrpc error: %v", err)
-		}
-	}
+/**
+设置Session信息持久化接口
+*/
+func (this *Gate) SetStorageHandler(storage StorageHandler) error {
+	this.storage = storage
+	return nil
 }
 
-func (a *agent) WriteMsg(msg interface{}) {
-	if a.gate.Processor != nil {
-		data, err := a.gate.Processor.Marshal(msg)
-		if err != nil {
-			log.Error("marshal message %v error: %v", reflect.TypeOf(msg), err)
-			return
-		}
-		err = a.conn.WriteMsg(data...)
-		if err != nil {
-			log.Error("write message %v error: %v", reflect.TypeOf(msg), err)
-		}
-	}
+func (this *Gate) NewSession(data []byte) (Session, error) {
+	return NewSession(this.AgentChanRPC, data)
 }
 
-func (a *agent) LocalAddr() net.Addr {
-	return a.conn.LocalAddr()
+/**
+设置客户端连接和断开的监听器
+*/
+func (this *Gate) SetSessionLearner(sessionLearner SessionLearner) error {
+	this.sessionLearner = sessionLearner
+	return nil
 }
 
-func (a *agent) RemoteAddr() net.Addr {
-	return a.conn.RemoteAddr()
+func (this *Gate) GetSessionLearner() SessionLearner {
+	return this.sessionLearner
 }
 
-func (a *agent) Close() {
-	a.conn.Close()
-}
-
-func (a *agent) Destroy() {
-	a.conn.Destroy()
-}
-
-func (a *agent) UserData() interface{} {
-	return a.userData
-}
-
-func (a *agent) SetUserData(data interface{}) {
-	a.userData = data
-}
-
-func (a *agent) SetAgentID(id int64) {
-	a.agentID = id
-}
-
-func (a *agent) GetAgentID() int64 {
-	return a.agentID
+func (this *Gate) GetAgentLearner() AgentLearner {
+	return this.agentLearner
 }

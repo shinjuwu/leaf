@@ -5,13 +5,12 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/shinjuwu/leaf/chanrpc"
-	"github.com/shinjuwu/leaf/gate"
 )
 
 type sessionagent struct {
 	AgentChanRPC *chanrpc.Server
 	session      *SessionImp
-	judgeGuest   func(session gate.Session) bool
+	judgeGuest   func(session Session) bool
 }
 
 func NewSession(chanRpc *chanrpc.Server, data []byte) (Session, error) {
@@ -157,7 +156,7 @@ func (this *sessionagent) Bind(userid string) (err error) {
 	if err == nil {
 		if result != nil {
 			//绑定成功,重新更新当前Session
-			this.update(result.(gate.Session))
+			this.update(result.(Session))
 		}
 	}
 	return
@@ -188,7 +187,7 @@ func (this *sessionagent) Push() (err error) {
 	if err == nil {
 		if result != nil {
 			//绑定成功,重新更新当前Session
-			this.update(result.(gate.Session))
+			this.update(result.(Session))
 		}
 	}
 	return
@@ -295,6 +294,6 @@ func (this *sessionagent) IsGuest() bool {
 }
 
 //设置自动的访客判断函数,记得一定要在全局的时候设置这个值,以免部分模块因为未设置这个判断函数造成错误的判断
-func (this *sessionagent) JudgeGuest(judgeGuest func(session gate.Session) bool) {
+func (this *sessionagent) JudgeGuest(judgeGuest func(session Session) bool) {
 	this.judgeGuest = judgeGuest
 }

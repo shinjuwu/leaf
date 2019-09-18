@@ -2,51 +2,98 @@ package gate
 
 import (
 	"net"
+	"reflect"
+
+	"github.com/shinjuwu/leaf/log"
+	"github.com/shinjuwu/leaf/network"
 )
 
-type Agent interface {
-	WriteMsg(msg interface{})
-	LocalAddr() net.Addr
-	RemoteAddr() net.Addr
-	Close()
-	Destroy()
-	UserData() interface{}
-	SetUserData(data interface{})
-	GetSession() Session
-	SetAgentID(id int64)
-	GetAgentID() int64
+type agent struct {
+	agentID  int64
+	conn     network.Conn
+	gate     *Gate
+	userData interface{}
+	session  Session
+	isclose  bool
 }
 
-type Session interface {
-	GetIP() string
-	GetNetwork() string
-	GetUserid() string
-	GetSessionid() string
-	GetServerid() string
-	GetSettings() map[string]string
-	SetIP(ip string)
-	SetNetwork(network string)
-	SetUserid(userid string)
-	SetSessionid(sessionid string)
-	SetServerid(serverid string)
-	SetSettings(settings map[string]string)
-	Serializable() ([]byte, error)
-	Update() (err string)
-	Bind(Userid string) (err error)
-	UnBind() (err error)
-	Push() (err error)
-	Set(key string, value string) (err error)
-	SetPush(key string, value string) (err error) //设置值以后立即推送到gate网关
-	Get(key string) (result string)
-	Remove(key string) (err error)
-	Send(topic string, body []byte) (err error)
-	SendNR(topic string, body []byte) (err error)
-	SendBatch(Sessionids string, topic string, body []byte) (int64, error) //想该客户端的网关批量发送消息
-	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
-	IsConnect(Userid string) (result bool, err error)
-	//是否是访客(未登录) ,默认判断规则为 userId==""代表访客
-	IsGuest() bool
-	//设置自动的访客判断函数,记得一定要在全局的时候设置这个值,以免部分模块因为未设置这个判断函数造成错误的判断
-	JudgeGuest(judgeGuest func(session Session) bool)
-	Close() (err string)
+func (a *agent) Run() {
+	for {
+		data, err := a.conn.ReadMsg()
+		if err != nil {
+			log.Debug("read message: %v", err)
+			break
+		}
+
+		if a.gate.Processor != nil {
+			msg, err := a.gate.Processor.Unmarshal(data)
+			if err != nil {
+				log.Debug("unmarshal message error: %v", err)
+				break
+			}
+			err = a.gate.Processor.Route(msg, a)
+			if err != nil {
+				log.Debug("route message error: %v", err)
+				break
+			}
+		}
+	}
+}
+
+func (a *agent) OnClose() {
+	a.isclose = true
+	a.gate.GetAgentLearner().DisConnect(a) //发送连接断开的事件
+}
+
+func (a *agent) WriteMsg(msg interface{}) {
+	if a.gate.Processor != nil {
+		data, err := a.gate.Processor.Marshal(msg)
+		if err != nil {
+			log.Error("marshal message %v error: %v", reflect.TypeOf(msg), err)
+			return
+		}
+		err = a.conn.WriteMsg(data...)
+		if err != nil {
+			log.Error("write message %v error: %v", reflect.TypeOf(msg), err)
+		}
+	}
+}
+
+func (a *agent) LocalAddr() net.Addr {
+	return a.conn.LocalAddr()
+}
+
+func (a *agent) RemoteAddr() net.Addr {
+	return a.conn.RemoteAddr()
+}
+
+func (a *agent) Close() {
+	a.conn.Close()
+}
+
+func (a *agent) Destroy() {
+	a.conn.Destroy()
+}
+
+func (a *agent) UserData() interface{} {
+	return a.userData
+}
+
+func (a *agent) SetUserData(data interface{}) {
+	a.userData = data
+}
+
+func (a *agent) SetAgentID(id int64) {
+	a.agentID = id
+}
+
+func (a *agent) GetAgentID() int64 {
+	return a.agentID
+}
+
+func (a agent) IsClosed() bool {
+	return a.isclose
+}
+func (a *agent) GetSession() Session {
+	return a.session
 }
