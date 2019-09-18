@@ -4,19 +4,19 @@ import (
 	fmt "fmt"
 	"strings"
 
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/utils"
+	"github.com/shinjuwu/leaf/log"
+	"github.com/shinjuwu/leaf/util"
 )
 
 type handler struct {
 	gate     Gate
-	sessions *utils.BeeMap //use sessionID be key
+	sessions *util.BeeMap //use sessionID be key
 }
 
 func NewGateHandler(gate Gate) *handler {
 	handler := &handler{
 		gate:     gate,
-		sessions: utils.NewBeeMap(),
+		sessions: util.NewBeeMap(),
 	}
 
 	return handler
@@ -109,7 +109,7 @@ func (h *handler) Push(sessionID string, settings map[string]string) (result Ses
 	if h.gate.GetStorageHandler() != nil && agent.(Agent).GetSession().GetUserid() != "" {
 		err := h.gate.GetStorageHandler().Storage(agent.(Agent).GetSession().GetUserid(), agent.(Agent).GetSession())
 		if err != nil {
-			log.Warning("gate session storage failure : %s", err.Error())
+			log.Debug("gate session storage failure : %s", err.Error())
 		}
 	}
 
