@@ -4,6 +4,8 @@ import (
 	"net"
 	"reflect"
 
+	"github.com/shinjuwu/leaf/util"
+
 	"github.com/shinjuwu/leaf/log"
 	"github.com/shinjuwu/leaf/network"
 )
@@ -24,7 +26,12 @@ func (a *agent) Run() {
 			log.Debug("read message: %v", err)
 			break
 		}
-
+		a.session, err = NewSessionByMap(a.gate.AgentChanRPC, map[string]interface{}{
+			"Sessionid": util.GenerateID().String(),
+			"Network":   a.conn.RemoteAddr().Network(),
+			"IP":        a.conn.RemoteAddr().String(),
+			"Settings":  make(map[string]string),
+		})
 		if a.gate.Processor != nil {
 			msg, err := a.gate.Processor.Unmarshal(data)
 			if err != nil {
