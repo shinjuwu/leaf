@@ -234,11 +234,11 @@ func (this *sessionagent) Remove(key string) (err error) {
 	delete(this.session.Settings, key)
 	return
 }
-func (this *sessionagent) Send(topic string, body []byte) error {
+func (this *sessionagent) Send(id string, data interface{}) error {
 	if this.AgentChanRPC == nil {
 		return fmt.Errorf("AgentChanRPC is nil")
 	}
-	_, err := this.AgentChanRPC.Call1("Send", this.session.Sessionid, topic, body)
+	_, err := this.AgentChanRPC.Call1("Send", this.session.Sessionid, data)
 	return err
 }
 
@@ -247,7 +247,7 @@ func (this *sessionagent) SendBatch(Sessionids string, topic string, body []byte
 		return 0, fmt.Errorf("AgentChanRPC is nil")
 	}
 
-	count, err := this.AgentChanRPC.Call1("SendBatch", Sessionids, topic, body)
+	count, err := this.AgentChanRPC.Call1("SendBatch", Sessionids, data)
 	if err != nil {
 		return 0, err
 	}
@@ -262,11 +262,11 @@ func (this *sessionagent) IsConnect(userId string) (bool, error) {
 	return result.(bool), err
 }
 
-func (this *sessionagent) SendNR(topic string, body []byte) error {
+func (this *sessionagent) SendNR(id string, data interface{}) error {
 	if this.AgentChanRPC == nil {
 		return fmt.Errorf("AgentChanRPC is nil")
 	}
-	err := this.AgentChanRPC.Call0("Send", this.session.Sessionid, topic, body)
+	err := this.AgentChanRPC.Call0("Send", this.session.Sessionid, data)
 	if err != nil {
 		return err
 	}
