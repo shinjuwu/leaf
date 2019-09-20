@@ -42,7 +42,7 @@ type Session interface {
 	Remove(key string) (err error)
 	Send(id string, data interface{}) (err error)
 	SendNR(id string, data interface{}) (err error)
-	SendBatch(Sessionids string, topic string, body []byte) (int64, error) //想该客户端的网关批量发送消息
+	SendBatch(Sessionids string, data interface{}) (int64, error) //想该客户端的网关批量发送消息
 	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
 	IsConnect(Userid string) (result bool, err error)
 	//是否是访客(未登录) ,默认判断规则为 userId==""代表访客
