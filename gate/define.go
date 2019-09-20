@@ -1,6 +1,8 @@
 package gate
 
-import "net"
+import (
+	"net"
+)
 
 type Agent interface {
 	WriteMsg(msg interface{})
@@ -83,4 +85,23 @@ type SessionLearner interface {
 type AgentLearner interface {
 	Connect(a Agent)    //当连接建立  并且MQTT协议握手成功
 	DisConnect(a Agent) //当连接关闭	或者客户端主动发送MQTT DisConnect命令
+}
+
+/**
+net代理服务 处理器
+*/
+type GateHandler interface {
+	Bind(Sessionid string, Userid string) (result Session, err string)              //Bind the session with the the Userid.
+	UnBind(Sessionid string) (result Session, err string)                           //UnBind the session with the the Userid.
+	Set(Sessionid string, key string, value string) (result Session, err string)    //Set values (one or many) for the session.
+	Remove(Sessionid string, key string) (result interface{}, err string)           //Remove value from the session.
+	Push(Sessionid string, Settings map[string]string) (result Session, err string) //推送信息给Session
+	Send(Sessionid string, data interface{}) (err string)                           //Send message
+	SendBatch(Sessionids string, data interface{}) (int64, string)                  //批量发送
+	BroadCast(data interface{}) int64                                               //广播消息给网关所有在连客户端
+	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
+	IsConnect(Sessionid string, Userid string) (result bool, err string)
+	Close(Sessionid string) error                         //主动关闭连接
+	Update(Sessionid string) (result Session, err string) //更新整个Session 通常是其他模块拉取最新数据
+	OnDestory()                                           //退出事件,主动关闭所有的连接
 }
