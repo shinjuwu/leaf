@@ -194,3 +194,11 @@ func (h *handler) Close(sessionID string) error {
 	agent.(Agent).Close()
 	return nil
 }
+
+func (h *handler) Connect(a Agent) {
+
+}
+
+func (h *handler) DisConnect(a Agent) {
+	
+}
