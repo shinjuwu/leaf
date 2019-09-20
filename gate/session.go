@@ -242,7 +242,7 @@ func (this *sessionagent) Send(id string, data interface{}) error {
 	return err
 }
 
-func (this *sessionagent) SendBatch(Sessionids string, topic string, body []byte) (int64, error) {
+func (this *sessionagent) SendBatch(Sessionids string, data interface{}) (int64, error) {
 	if this.AgentChanRPC == nil {
 		return 0, fmt.Errorf("AgentChanRPC is nil")
 	}
