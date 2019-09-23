@@ -75,7 +75,7 @@ func (h *handler) Bind(agrs []interface{}) interface{} {
 			}
 		}
 	}
-	return ""
+	return agent.(Agent).GetSession()
 }
 
 func (h *handler) IsConnect(args []interface{}) interface{} {
