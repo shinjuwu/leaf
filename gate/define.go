@@ -33,18 +33,18 @@ type Session interface {
 	SetSettings(settings map[string]string)
 	Serializable() ([]byte, error)
 	Update() (err error)
-	Bind(Userid string) (err error)
-	UnBind() (err error)
-	Push() (err error)
-	Set(key string, value string) (err error)
-	SetPush(key string, value string) (err error) //设置值以后立即推送到gate网关
-	Get(key string) (result string)
-	Remove(key string) (err error)
-	Send(id string, data interface{}) (err error)
-	SendNR(id string, data interface{}) (err error)
-	SendBatch(Sessionids string, data interface{}) (int64, error) //想该客户端的网关批量发送消息
+	Bind(Userid string) string
+	UnBind() string
+	Push() string
+	Set(key string, value string) string
+	SetPush(key string, value string) string //设置值以后立即推送到gate网关
+	Get(key string) string
+	Remove(key string) string
+	Send(id string, data interface{}) string
+	SendNR(id string, data interface{}) string
+	SendBatch(Sessionids string, data interface{}) string //想该客户端的网关批量发送消息
 	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
-	IsConnect(Userid string) (result bool, err error)
+	IsConnect(Userid string) string
 	//是否是访客(未登录) ,默认判断规则为 userId==""代表访客
 	IsGuest() bool
 	//设置自动的访客判断函数,记得一定要在全局的时候设置这个值,以免部分模块因为未设置这个判断函数造成错误的判断

@@ -146,10 +146,9 @@ func (this *sessionagent) Update() (err error) {
 	return
 }
 
-func (this *sessionagent) Bind(userid string) (err error) {
+func (this *sessionagent) Bind(userid string) string {
 	if this.AgentChanRPC == nil {
-		err = fmt.Errorf("AgentChanRPC is nil")
-		return
+		return "AgentChanRPC is nil"
 	}
 
 	result, err := this.AgentChanRPC.Call1("Bind", this.session.Sessionid, userid)
@@ -159,13 +158,12 @@ func (this *sessionagent) Bind(userid string) (err error) {
 			this.update(result.(Session))
 		}
 	}
-	return
+	return ""
 }
 
-func (this *sessionagent) UnBind() (err error) {
+func (this *sessionagent) UnBind() string {
 	if this.AgentChanRPC == nil {
-		err = fmt.Errorf("AgentChanRPC is nil")
-		return
+		return "AgentChanRPC is nil"
 	}
 	result, err := this.AgentChanRPC.Call1("Unbind", this.session.Sessionid)
 	if err == nil {
@@ -174,13 +172,12 @@ func (this *sessionagent) UnBind() (err error) {
 			this.update(result.(Session))
 		}
 	}
-	return
+	return ""
 }
 
-func (this *sessionagent) Push() (err error) {
+func (this *sessionagent) Push() string {
 	if this.AgentChanRPC == nil {
-		err = fmt.Errorf("AgentChanRPC is nil")
-		return
+		return "AgentChanRPC is nil"
 	}
 
 	result, err := this.AgentChanRPC.Call1("Push", this.session.Sessionid, this.session.Settings)
@@ -190,24 +187,22 @@ func (this *sessionagent) Push() (err error) {
 			this.update(result.(Session))
 		}
 	}
-	return
+	return ""
 }
 
-func (this *sessionagent) Set(key string, value string) (err error) {
+func (this *sessionagent) Set(key string, value string) string {
 	if this.AgentChanRPC == nil {
-		err = fmt.Errorf("AgentChanRPC is nil")
-		return
+		return "AgentChanRPC is nil"
 	}
 	if this.session.Settings == nil {
 		this.session.Settings = map[string]string{}
 	}
 	this.session.Settings[key] = value
-	return
+	return ""
 }
-func (this *sessionagent) SetPush(key string, value string) (err error) {
+func (this *sessionagent) SetPush(key string, value string) string {
 	if this.AgentChanRPC == nil {
-		err = fmt.Errorf("AgentChanRPC is nil")
-		return
+		return "AgentChanRPC is nil"
 	}
 	if this.session.Settings == nil {
 		this.session.Settings = map[string]string{}
@@ -223,54 +218,59 @@ func (this *sessionagent) Get(key string) (result string) {
 	return
 }
 
-func (this *sessionagent) Remove(key string) (err error) {
+func (this *sessionagent) Remove(key string) string {
 	if this.AgentChanRPC == nil {
-		err = fmt.Errorf("AgentChanRPC is nil")
-		return
+		return "AgentChanRPC is nil"
 	}
 	if this.session.Settings == nil {
 		this.session.Settings = map[string]string{}
 	}
 	delete(this.session.Settings, key)
-	return
+	return ""
 }
-func (this *sessionagent) Send(id string, data interface{}) error {
+func (this *sessionagent) Send(id string, data interface{}) string {
 	if this.AgentChanRPC == nil {
-		return fmt.Errorf("AgentChanRPC is nil")
+		return "AgentChanRPC is nil"
 	}
 	_, err := this.AgentChanRPC.Call1("Send", this.session.Sessionid, data)
-	return err
-}
-
-func (this *sessionagent) SendBatch(Sessionids string, data interface{}) (int64, error) {
-	if this.AgentChanRPC == nil {
-		return 0, fmt.Errorf("AgentChanRPC is nil")
-	}
-
-	count, err := this.AgentChanRPC.Call1("SendBatch", Sessionids, data)
 	if err != nil {
-		return 0, err
+		return err.Error()
 	}
-	return count.(int64), err
+	return ""
 }
 
-func (this *sessionagent) IsConnect(userId string) (bool, error) {
+func (this *sessionagent) SendBatch(Sessionids string, data interface{}) string {
 	if this.AgentChanRPC == nil {
-		return false, fmt.Errorf("AgentChanRPC is nil")
+		return "AgentChanRPC is nil"
 	}
-	result, err := this.AgentChanRPC.Call1("IsConnect", this.session.Sessionid, userId)
-	return result.(bool), err
+
+	_, err := this.AgentChanRPC.Call1("SendBatch", Sessionids, data)
+	if err != nil {
+		return err.Error()
+	}
+	return ""
 }
 
-func (this *sessionagent) SendNR(id string, data interface{}) error {
+func (this *sessionagent) IsConnect(userId string) string {
 	if this.AgentChanRPC == nil {
-		return fmt.Errorf("AgentChanRPC is nil")
+		return "AgentChanRPC is nil"
+	}
+	_, err := this.AgentChanRPC.Call1("IsConnect", this.session.Sessionid, userId)
+	if err != nil {
+		return err.Error()
+	}
+	return ""
+}
+
+func (this *sessionagent) SendNR(id string, data interface{}) string {
+	if this.AgentChanRPC == nil {
+		return "AgentChanRPC is nil"
 	}
 	err := this.AgentChanRPC.Call0("Send", this.session.Sessionid, data)
 	if err != nil {
-		return err
+		return err.Error()
 	}
-	return nil
+	return ""
 }
 
 func (this *sessionagent) Close() error {
