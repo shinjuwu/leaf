@@ -29,14 +29,24 @@ func (h *handler) OnDestory() {
 	h.sessions.DeleteAll()
 }
 
-func (h *handler) Update(sessionID string) (reslut Session, err string) {
+// func (h *handler) Update(sessionID string) (reslut Session, err string) {
+// 	agent := h.sessions.Get(sessionID)
+// 	if agent == nil {
+// 		err = "No agent found"
+// 		return
+// 	}
+// 	reslut = agent.(Agent).GetSession()
+// 	return
+// }
+
+//Update : f(sessionID string) error
+func (h *handler) Update(args []interface{}) interface{} {
+	sessionID := args[0].(string)
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		err = "No agent found"
-		return
+		return "No agent found"
 	}
-	reslut = agent.(Agent).GetSession()
-	return
+	return ""
 }
 
 func (h *handler) Bind(Sessionid string, Userid string) (result Session, err string) {

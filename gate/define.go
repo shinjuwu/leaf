@@ -101,7 +101,7 @@ type GateHandler interface {
 	BroadCast(data interface{}) int64                                               //广播消息给网关所有在连客户端
 	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
 	IsConnect(Sessionid string, Userid string) (result bool, err string)
-	Close(Sessionid string) error                         //主动关闭连接
-	Update(Sessionid string) (result Session, err string) //更新整个Session 通常是其他模块拉取最新数据
-	OnDestory()                                           //退出事件,主动关闭所有的连接
+	Close(Sessionid string) error          //主动关闭连接
+	Update(args []interface{}) interface{} //更新整个Session 通常是其他模块拉取最新数据
+	OnDestory()                            //退出事件,主动关闭所有的连接
 }
