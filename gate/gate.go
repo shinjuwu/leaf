@@ -39,16 +39,16 @@ func (gate *Gate) OnInit() {
 	gate.agentLearner = handler
 	gate.handler = handler
 	gate.AgentChanRPC.Register("Update", gate.handler.Update)
-	// gate.AgentChanRPC.Register("Bind", gate.handler.Bind)
-	// gate.AgentChanRPC.Register("UnBind", gate.handler.UnBind)
-	// gate.AgentChanRPC.Register("Push", gate.handler.Push)
-	// gate.AgentChanRPC.Register("Set", gate.handler.Set)
-	// gate.AgentChanRPC.Register("Remove", gate.handler.Remove)
-	// gate.AgentChanRPC.Register("Send", gate.handler.Send)
-	// gate.AgentChanRPC.Register("SendBatch", gate.handler.SendBatch)
-	// gate.AgentChanRPC.Register("BroadCast", gate.handler.BroadCast)
-	// gate.AgentChanRPC.Register("IsConnect", gate.handler.IsConnect)
-	// gate.AgentChanRPC.Register("Close", gate.handler.Close)
+	gate.AgentChanRPC.Register("Bind", gate.handler.Bind)
+	gate.AgentChanRPC.Register("UnBind", gate.handler.UnBind)
+	gate.AgentChanRPC.Register("Push", gate.handler.Push)
+	gate.AgentChanRPC.Register("Set", gate.handler.Set)
+	gate.AgentChanRPC.Register("Remove", gate.handler.Remove)
+	gate.AgentChanRPC.Register("Send", gate.handler.Send)
+	gate.AgentChanRPC.Register("SendBatch", gate.handler.SendBatch)
+	gate.AgentChanRPC.Register("BroadCast", gate.handler.BroadCast)
+	gate.AgentChanRPC.Register("IsConnect", gate.handler.IsConnect)
+	gate.AgentChanRPC.Register("Close", gate.handler.Close)
 }
 
 func (gate *Gate) Run(closeSig chan bool) {

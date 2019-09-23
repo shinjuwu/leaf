@@ -1,7 +1,6 @@
 package gate
 
 import (
-	fmt "fmt"
 	"strings"
 
 	"github.com/shinjuwu/leaf/log"
@@ -29,16 +28,6 @@ func (h *handler) OnDestory() {
 	h.sessions.DeleteAll()
 }
 
-// func (h *handler) Update(sessionID string) (reslut Session, err string) {
-// 	agent := h.sessions.Get(sessionID)
-// 	if agent == nil {
-// 		err = "No agent found"
-// 		return
-// 	}
-// 	reslut = agent.(Agent).GetSession()
-// 	return
-// }
-
 //Update : f(sessionID string) error
 func (h *handler) Update(args []interface{}) interface{} {
 	sessionID := args[0].(string)
@@ -49,11 +38,13 @@ func (h *handler) Update(args []interface{}) interface{} {
 	return ""
 }
 
-func (h *handler) Bind(Sessionid string, Userid string) (result Session, err string) {
+//Bind : f(sessionID string, userID string) error
+func (h *handler) Bind(agrs []interface{}) interface{} {
+	Sessionid := agrs[0].(string)
+	Userid := agrs[1].(string)
 	agent := h.sessions.Get(Sessionid)
 	if agent == nil {
-		err = "No Sesssion found"
-		return
+		return "No Sesssion found"
 	}
 	agent.(Agent).GetSession().SetUserid(Userid)
 
@@ -84,38 +75,37 @@ func (h *handler) Bind(Sessionid string, Userid string) (result Session, err str
 			}
 		}
 	}
-	result = agent.(Agent).GetSession()
-	return
+	return ""
 }
 
-func (h *handler) IsConnect(Sessionid string, Userid string) (bool, string) {
+func (h *handler) IsConnect(args []interface{}) interface{} {
+	Userid := args[0].(string)
 	for _, agent := range h.sessions.Items() {
 		if agent.(Agent).GetSession().GetUserid() == Userid {
-			return !agent.(Agent).IsClosed(), ""
+			return !agent.(Agent).IsClosed()
 		}
 	}
-	return false, fmt.Sprintf("The gateway did not find the corresponding userId 【%s】", Userid)
+	return false
 }
 
-func (h *handler) UnBind(sessionID string) (result Session, err string) {
+func (h *handler) UnBind(args []interface{}) interface{} {
+	sessionID := args[0].(string)
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		err = "No Session found"
-		return
+		return "No Session found"
 	}
 	agent.(Agent).GetSession().SetUserid("")
-	result = agent.(Agent).GetSession()
-	return
+	return ""
 }
 
-func (h *handler) Push(sessionID string, settings map[string]string) (result Session, err string) {
+func (h *handler) Push(args []interface{}) interface{} {
+	sessionID := args[0].(string)
+	settings := args[1].(map[string]string)
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		err = "No Session found"
-		return
+		return "No Session found"
 	}
 	agent.(Agent).GetSession().SetSettings(settings)
-	result = agent.(Agent).GetSession()
 	if h.gate.GetStorageHandler() != nil && agent.(Agent).GetSession().GetUserid() != "" {
 		err := h.gate.GetStorageHandler().Storage(agent.(Agent).GetSession().GetUserid(), agent.(Agent).GetSession())
 		if err != nil {
@@ -123,17 +113,18 @@ func (h *handler) Push(sessionID string, settings map[string]string) (result Ses
 		}
 	}
 
-	return
+	return ""
 }
 
-func (h *handler) Set(sessionID string, key string, value string) (result Session, err string) {
+func (h *handler) Set(args []interface{}) interface{} {
+	sessionID := args[0].(string)
+	key := args[1].(string)
+	value := args[2].(string)
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		err = "No Session found"
-		return
+		return "No Session found"
 	}
 	agent.(Agent).GetSession().GetSettings()[key] = value
-	result = agent.(Agent).GetSession()
 
 	if h.gate.GetStorageHandler() != nil && agent.(Agent).GetSession().GetUserid() != "" {
 		err := h.gate.GetStorageHandler().Storage(agent.(Agent).GetSession().GetUserid(), agent.(Agent).GetSession())
@@ -141,17 +132,17 @@ func (h *handler) Set(sessionID string, key string, value string) (result Sessio
 			log.Error("gate session storage failure : %s", err.Error())
 		}
 	}
-	return
+	return ""
 }
 
-func (h *handler) Remove(sessionID string, key string) (reslut interface{}, err string) {
+func (h *handler) Remove(args []interface{}) interface{} {
+	sessionID := args[0].(string)
+	key := args[1].(string)
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		err = "No Session found"
-		return
+		return "No Session found"
 	}
 	delete(agent.(Agent).GetSession().GetSettings(), key)
-	reslut = agent.(Agent).GetSession()
 
 	if h.gate.GetStorageHandler() != nil && agent.(Agent).GetSession().GetUserid() != "" {
 		err := h.gate.GetStorageHandler().Storage(agent.(Agent).GetSession().GetUserid(), agent.(Agent).GetSession())
@@ -160,20 +151,23 @@ func (h *handler) Remove(sessionID string, key string) (reslut interface{}, err 
 		}
 	}
 
-	return
+	return ""
 }
 
-func (h *handler) Send(sessionID string, data interface{}) (err string) {
+func (h *handler) Send(args []interface{}) interface{} {
+	sessionID := args[0].(string)
+	data := args[1]
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		err = "No session found"
-		return
+		return "No session found"
 	}
 	agent.(Agent).WriteMsg(data)
-	return
+	return ""
 }
 
-func (h *handler) SendBatch(sessionIDStr string, data interface{}) (int64, string) {
+func (h *handler) SendBatch(args []interface{}) interface{} {
+	sessionIDStr := args[0].(string)
+	data := args[1]
 	sessionIDs := strings.Split(sessionIDStr, ",")
 	var count int64 = 0
 	for _, sessionID := range sessionIDs {
@@ -184,10 +178,11 @@ func (h *handler) SendBatch(sessionIDStr string, data interface{}) (int64, strin
 		agent.(Agent).WriteMsg(data)
 		count++
 	}
-	return count, ""
+	return ""
 }
 
-func (h *handler) BroadCast(data interface{}) int64 {
+func (h *handler) BroadCast(args []interface{}) interface{} {
+	data := args[0]
 	var count int64 = 0
 	for _, agent := range h.sessions.Items() {
 		agent.(Agent).WriteMsg(data)
@@ -196,13 +191,14 @@ func (h *handler) BroadCast(data interface{}) int64 {
 	return count
 }
 
-func (h *handler) Close(sessionID string) error {
+func (h *handler) Close(args []interface{}) interface{} {
+	sessionID := args[0].(string)
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		return fmt.Errorf("No session found")
+		return "No session found"
 	}
 	agent.(Agent).Close()
-	return nil
+	return ""
 }
 
 func (h *handler) Connect(a Agent) {
