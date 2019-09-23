@@ -32,6 +32,7 @@ func (a *agent) Run() {
 			"IP":        a.conn.RemoteAddr().String(),
 			"Settings":  make(map[string]string),
 		})
+		a.gate.GetAgentLearner().Connect(a)
 		if a.gate.Processor != nil {
 			msg, err := a.gate.Processor.Unmarshal(data)
 			if err != nil {

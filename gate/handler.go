@@ -202,9 +202,19 @@ func (h *handler) Close(args []interface{}) interface{} {
 }
 
 func (h *handler) Connect(a Agent) {
-
+	if a.GetSession() != nil {
+		h.sessions.Set(a.GetSession().GetSessionid(), a)
+	}
+	if h.gate.GetSessionLearner() != nil {
+		h.gate.GetSessionLearner().Connect(a.GetSession())
+	}
 }
 
 func (h *handler) DisConnect(a Agent) {
-
+	if a.GetSession() != nil {
+		h.sessions.Delete(a.GetSession().GetSessionid())
+	}
+	if h.gate.GetSessionLearner() != nil {
+		h.gate.GetSessionLearner().DisConnect(a.GetSession())
+	}
 }
