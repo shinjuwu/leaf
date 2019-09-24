@@ -167,7 +167,7 @@ func (h *handler) Send(args []interface{}) interface{} {
 
 func (h *handler) SendBatch(args []interface{}) interface{} {
 	sessionIDStr := args[0].(string)
-	data := args[1]
+	data := args[1].(*[]byte)
 	sessionIDs := strings.Split(sessionIDStr, ",")
 	var count int64 = 0
 	for _, sessionID := range sessionIDs {
@@ -175,7 +175,7 @@ func (h *handler) SendBatch(args []interface{}) interface{} {
 		if agent == nil {
 			continue
 		}
-		agent.(Agent).WriteMsg(data)
+		agent.(Agent).WriteMsgByte([][]byte{*data})
 		count++
 	}
 	return ""
