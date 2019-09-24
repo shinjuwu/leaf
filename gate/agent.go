@@ -67,6 +67,13 @@ func (a *agent) WriteMsg(msg interface{}) {
 	}
 }
 
+func (a *agent) WriteMsgByte(data [][]byte) {
+	err := a.conn.WriteMsg(data...)
+	if err != nil {
+		log.Error("write message %v error: %v", data, err)
+	}
+}
+
 func (a *agent) LocalAddr() net.Addr {
 	return a.conn.LocalAddr()
 }
