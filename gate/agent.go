@@ -12,6 +12,7 @@ import (
 
 type agent struct {
 	agentID  int64
+	tableID  int
 	conn     network.Conn
 	gate     *Gate
 	userData interface{}
@@ -111,4 +112,11 @@ func (a agent) IsClosed() bool {
 }
 func (a *agent) GetSession() Session {
 	return a.session
+}
+func (a *agent) SetTableID(id int) {
+	a.tableID = id
+}
+
+func (a *agent) GetTableID() int {
+	return a.tableID
 }

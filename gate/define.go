@@ -17,6 +17,8 @@ type Agent interface {
 	SetAgentID(id int64)
 	GetAgentID() int64
 	IsClosed() bool
+	SetTableID(id int)
+	GetTableID() int
 }
 
 type Session interface {
