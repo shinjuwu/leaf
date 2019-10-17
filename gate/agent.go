@@ -1,7 +1,6 @@
 package gate
 
 import (
-	fmt "fmt"
 	"net"
 	"reflect"
 
@@ -28,14 +27,15 @@ func (a *agent) Run() {
 			log.Debug("read message: %v", err)
 			break
 		}
-		session := a.GetSession()
-		fmt.Println(session)
-		a.session, err = NewSessionByMap(a.gate.AgentChanRPC, map[string]interface{}{
-			"Sessionid": util.GenerateID().String(),
-			"Network":   a.conn.RemoteAddr().Network(),
-			"IP":        a.conn.RemoteAddr().String(),
-			"Settings":  make(map[string]string),
-		})
+
+		if a.GetSession() == nil {
+			a.session, err = NewSessionByMap(a.gate.AgentChanRPC, map[string]interface{}{
+				"Sessionid": util.GenerateID().String(),
+				"Network":   a.conn.RemoteAddr().Network(),
+				"IP":        a.conn.RemoteAddr().String(),
+				"Settings":  make(map[string]string),
+			})
+		}
 		a.gate.GetAgentLearner().Connect(a)
 		if a.gate.Processor != nil {
 			msg, err := a.gate.Processor.Unmarshal(data)
