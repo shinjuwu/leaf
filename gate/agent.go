@@ -1,6 +1,7 @@
 package gate
 
 import (
+	"fmt"
 	"net"
 	"reflect"
 
@@ -27,7 +28,7 @@ func (a *agent) Run() {
 			log.Debug("read message: %v", err)
 			break
 		}
-
+		fmt.Println(a.GetSession())
 		if a.GetSession() == nil {
 			a.session, err = NewSessionByMap(a.gate.AgentChanRPC, map[string]interface{}{
 				"Sessionid": util.GenerateID().String(),
