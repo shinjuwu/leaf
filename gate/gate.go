@@ -105,7 +105,6 @@ func (gate *Gate) Run(closeSig chan bool) {
 }
 
 func (gate *Gate) OnDestroy() {
-
 }
 
 func (this *Gate) GetStorageHandler() (storage StorageHandler) {
