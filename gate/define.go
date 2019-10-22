@@ -94,14 +94,14 @@ type AgentLearner interface {
 net代理服务 处理器
 */
 type GateHandler interface {
-	Bind(args []interface{}) interface{}       //Bind the session with the the Userid.
-	UnBind(args []interface{}) interface{}     //UnBind the session with the the Userid.
-	Set(args []interface{}) interface{}        //Set values (one or many) for the session.
-	Remove(args []interface{}) interface{}     //Remove value from the session.
-	Push(args []interface{}) (Session, string) //推送信息给Session
-	Send(args []interface{}) interface{}       //Send message
-	SendBatch(args []interface{}) interface{}  //批量发送
-	BroadCast(args []interface{}) interface{}  //广播消息给网关所有在连客户端
+	Bind(args []interface{}) interface{}      //Bind the session with the the Userid.
+	UnBind(args []interface{}) interface{}    //UnBind the session with the the Userid.
+	Set(args []interface{}) interface{}       //Set values (one or many) for the session.
+	Remove(args []interface{}) interface{}    //Remove value from the session.
+	Push(args []interface{}) interface{}      //推送信息给Session
+	Send(args []interface{}) interface{}      //Send message
+	SendBatch(args []interface{}) interface{} //批量发送
+	BroadCast(args []interface{}) interface{} //广播消息给网关所有在连客户端
 	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
 	IsConnect(args []interface{}) interface{}
 	Close(args []interface{}) interface{}  //主动关闭连接

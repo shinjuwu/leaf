@@ -98,23 +98,22 @@ func (h *handler) UnBind(args []interface{}) interface{} {
 	return ""
 }
 
-func (h *handler) Push(args []interface{}) (result Session, err string) {
+func (h *handler) Push(args []interface{}) interface{} {
 	sessionID := args[0].(string)
 	settings := args[1].(map[string]string)
 	agent := h.sessions.Get(sessionID)
 	if agent == nil {
-		err = "No Session found"
-		return
+		return "No Session found"
 	}
 	agent.(Agent).GetSession().SetSettings(settings)
-	result = agent.(Agent).GetSession()
+	result := agent.(Agent).GetSession()
 	if h.gate.GetStorageHandler() != nil && agent.(Agent).GetSession().GetUserid() != "" {
 		err := h.gate.GetStorageHandler().Storage(agent.(Agent).GetSession().GetUserid(), agent.(Agent).GetSession())
 		if err != nil {
 			log.Debug("gate session storage failure : %s", err.Error())
 		}
 	}
-	return
+	return result
 }
 
 func (h *handler) Set(args []interface{}) interface{} {
