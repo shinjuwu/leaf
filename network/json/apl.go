@@ -184,7 +184,8 @@ func (p *NeooneProcessor) Unmarshal(data []byte) (interface{}, error) {
 				return MsgRaw{msgID, data}, nil
 			} else {
 				msg := reflect.New(i.msgType.Elem()).Interface()
-				return msg, json.Unmarshal([]byte(v.(string)), &msg)
+				b, _ := json.Marshal(v)
+				return msg, json.Unmarshal(b, &msg)
 			}
 		}
 	}
