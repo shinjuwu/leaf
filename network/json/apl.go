@@ -67,7 +67,7 @@ func (p *NeooneProcessor) SetRouter(msgID string, msgRouter *chanrpc.Server) {
 }
 
 //SetRouterJSON is Used for pure json message
-func (p *Processor) SetRouterJSON(msg interface{}, msgRouter *chanrpc.Server) {
+func (p *NeooneProcessor) SetRouterJSON(msg interface{}, msgRouter *chanrpc.Server) {
 	msgType := reflect.TypeOf(msg)
 	if msgType == nil || msgType.Kind() != reflect.Ptr {
 		log.Fatal("json message pointer required")
@@ -87,21 +87,6 @@ func (p *NeooneProcessor) SetHandler(msgID string, msgHandler MsgHandler) {
 	if !ok {
 		log.Fatal("message %v not registered", msgID)
 	}
-	i.msgHandler = msgHandler
-}
-
-//SetHandlerJSON is used for pure json message
-func (p *Processor) SetHandlerJSON(msg interface{}, msgHandler MsgHandler) {
-	msgType := reflect.TypeOf(msg)
-	if msgType == nil || msgType.Kind() != reflect.Ptr {
-		log.Fatal("json message pointer required")
-	}
-	msgID := msgType.Elem().Name()
-	i, ok := p.msgInfo[msgID]
-	if !ok {
-		log.Fatal("message %v not registered", msgID)
-	}
-
 	i.msgHandler = msgHandler
 }
 
