@@ -37,6 +37,26 @@ func (p *NeooneProcessor) Register(msgID string, msg interface{}) {
 	p.msgInfo[msgID] = i
 }
 
+//RegisterJSON is used to pure json message
+func (p *NeooneProcessor) RegisterJSON(msg interface{}) string {
+	msgType := reflect.TypeOf(msg)
+	if msgType == nil || msgType.Kind() != reflect.Ptr {
+		log.Fatal("json message pointer required")
+	}
+	msgID := msgType.Elem().Name()
+	if msgID == "" {
+		log.Fatal("unnamed json message")
+	}
+	if _, ok := p.msgInfo[msgID]; ok {
+		log.Fatal("message %v is already registered", msgID)
+	}
+
+	i := new(MsgInfo)
+	i.msgType = msgType
+	p.msgInfo[msgID] = i
+	return msgID
+}
+
 //SetRouter is a extension for old Neoone msg struct. In common, don't use this func to register your msg in new project.
 func (p *NeooneProcessor) SetRouter(msgID string, msgRouter *chanrpc.Server) {
 	i, ok := p.msgInfo[msgID]
@@ -46,12 +66,42 @@ func (p *NeooneProcessor) SetRouter(msgID string, msgRouter *chanrpc.Server) {
 	i.msgRouter = msgRouter
 }
 
+//SetRouterJSON is Used for pure json message
+func (p *Processor) SetRouterJSON(msg interface{}, msgRouter *chanrpc.Server) {
+	msgType := reflect.TypeOf(msg)
+	if msgType == nil || msgType.Kind() != reflect.Ptr {
+		log.Fatal("json message pointer required")
+	}
+	msgID := msgType.Elem().Name()
+	i, ok := p.msgInfo[msgID]
+	if !ok {
+		log.Fatal("message %v not registered", msgID)
+	}
+
+	i.msgRouter = msgRouter
+}
+
 //SetHandler is a extension for old Neoone msg struct. In common, don't use this func to register your msg in new project.
 func (p *NeooneProcessor) SetHandler(msgID string, msgHandler MsgHandler) {
 	i, ok := p.msgInfo[msgID]
 	if !ok {
 		log.Fatal("message %v not registered", msgID)
 	}
+	i.msgHandler = msgHandler
+}
+
+//SetHandlerJSON is used for pure json message
+func (p *Processor) SetHandlerJSON(msg interface{}, msgHandler MsgHandler) {
+	msgType := reflect.TypeOf(msg)
+	if msgType == nil || msgType.Kind() != reflect.Ptr {
+		log.Fatal("json message pointer required")
+	}
+	msgID := msgType.Elem().Name()
+	i, ok := p.msgInfo[msgID]
+	if !ok {
+		log.Fatal("message %v not registered", msgID)
+	}
+
 	i.msgHandler = msgHandler
 }
 
@@ -77,6 +127,12 @@ func (p *NeooneProcessor) Route(msgwithID interface{}, userData interface{}) err
 		}
 		return nil
 	}
+	msgType := reflect.TypeOf(msgwithID)
+	if msgType == nil || msgType.Kind() != reflect.Ptr {
+		return errors.New("json message pointer required")
+	}
+	msgID := msgType.Elem().Name()
+	fmt.Println(msgID)
 	msgMap := msgwithID.(map[string]interface{})
 	if len(msgMap) != 1 {
 		return fmt.Errorf("invaild msg %v", msgMap)
@@ -128,8 +184,27 @@ func (p *NeooneProcessor) Unmarshal(data []byte) (interface{}, error) {
 			}
 		}
 	} else {
-		return nil, errors.New("invalid json data")
+		if len(m) != 1 {
+			return nil, errors.New("invalid json data")
+		}
+
+		for msgID, v := range m {
+			data := v.(json.RawMessage)
+			i, ok := p.msgInfo[msgID]
+			if !ok {
+				return nil, fmt.Errorf("message %v not registered", msgID)
+			}
+
+			// msg
+			if i.msgRawHandler != nil {
+				return MsgRaw{msgID, data}, nil
+			} else {
+				msg := reflect.New(i.msgType.Elem()).Interface()
+				return msg, json.Unmarshal(data, msg)
+			}
+		}
 	}
+	return nil, errors.New("invalid json data")
 }
 
 func (p *NeooneProcessor) Marshal(msg interface{}) ([][]byte, error) {

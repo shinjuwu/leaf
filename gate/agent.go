@@ -48,18 +48,6 @@ func (a *agent) Run() {
 				break
 			}
 		}
-		if a.gate.CustomProcessor != nil {
-			msg, err := a.gate.CustomProcessor.Unmarshal(data)
-			if err != nil {
-				log.Debug("unmarshal message error: %v", err)
-				break
-			}
-			err = a.gate.CustomProcessor.Route(msg, a)
-			if err != nil {
-				log.Debug("route message error: %v", err)
-				break
-			}
-		}
 	}
 }
 
