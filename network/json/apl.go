@@ -174,7 +174,6 @@ func (p *NeooneProcessor) Unmarshal(data []byte) (interface{}, error) {
 		}
 
 		for msgID, v := range m {
-			data := v.(json.RawMessage)
 			i, ok := p.msgInfo[msgID]
 			if !ok {
 				return nil, fmt.Errorf("message %v not registered", msgID)
@@ -185,7 +184,7 @@ func (p *NeooneProcessor) Unmarshal(data []byte) (interface{}, error) {
 				return MsgRaw{msgID, data}, nil
 			} else {
 				msg := reflect.New(i.msgType.Elem()).Interface()
-				return msg, json.Unmarshal(data, msg)
+				return msg, json.Unmarshal([]byte(v.(string)), msg)
 			}
 		}
 	}
