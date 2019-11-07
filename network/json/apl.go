@@ -100,9 +100,9 @@ func (p *NeooneProcessor) SetRawHandler(msgID string, msgRawHandler MsgHandler) 
 	i.msgRawHandler = msgRawHandler
 }
 
-func (p *NeooneProcessor) Route(msgwithID interface{}, userData interface{}) error {
+func (p *NeooneProcessor) Route(msg interface{}, userData interface{}) error {
 	// raw
-	if msgRaw, ok := msgwithID.(MsgRaw); ok {
+	if msgRaw, ok := msg.(MsgRaw); ok {
 		i, ok := p.msgInfo[msgRaw.msgID]
 		if !ok {
 			return fmt.Errorf("message %v not registered", msgRaw.msgID)
@@ -112,22 +112,36 @@ func (p *NeooneProcessor) Route(msgwithID interface{}, userData interface{}) err
 		}
 		return nil
 	}
-	msgType := reflect.TypeOf(msgwithID)
+	msgType := reflect.TypeOf(msg)
 	if msgType == nil || msgType.Kind() != reflect.Ptr {
 		return errors.New("json message pointer required")
 	}
 	msgID := msgType.Elem().Name()
-	fmt.Println(msgID)
-	msgMap := msgwithID.(map[string]interface{})
-	if len(msgMap) != 1 {
-		return fmt.Errorf("invaild msg %v", msgMap)
-	}
-	for msgID, msg := range msgMap {
-		// json
-		msgType := reflect.TypeOf(msg)
-		if msgType == nil || msgType.Kind() != reflect.Ptr {
-			return errors.New("json message pointer required")
+	if msgID == "" {
+		msgMap := msg.(map[string]interface{})
+		if len(msgMap) != 1 {
+			return fmt.Errorf("invaild msg %v", msgMap)
 		}
+		for msgID, msg := range msgMap {
+			// json
+			msgType := reflect.TypeOf(msg)
+			if msgType == nil || msgType.Kind() != reflect.Ptr {
+				return errors.New("json message pointer required")
+			}
+			i, ok := p.msgInfo[msgID]
+			if !ok {
+				return fmt.Errorf("message %v not registered", msgID)
+			}
+			if i.msgHandler != nil {
+				i.msgHandler([]interface{}{msg, userData})
+			}
+			if i.msgRouter != nil {
+				i.msgRouter.Go(msgType, msg, userData)
+			}
+			return nil
+		}
+
+	} else {
 		i, ok := p.msgInfo[msgID]
 		if !ok {
 			return fmt.Errorf("message %v not registered", msgID)
@@ -140,7 +154,8 @@ func (p *NeooneProcessor) Route(msgwithID interface{}, userData interface{}) err
 		}
 		return nil
 	}
-	return fmt.Errorf("not register message %v", msgMap)
+
+	return fmt.Errorf("not register message %v", msg)
 }
 
 func (p *NeooneProcessor) Unmarshal(data []byte) (interface{}, error) {
