@@ -163,7 +163,7 @@ func (p *NeooneProcessor) Unmarshal(data []byte) (interface{}, error) {
 				msgID: msg,
 			}
 			if cmdData, ok := m["data"]; ok {
-				return msgwithID, json.Unmarshal([]byte(cmdData.(string)), &msg)
+				return &msgwithID, json.Unmarshal([]byte(cmdData.(string)), &msg)
 			} else {
 				return nil, errors.New("invalid json data")
 			}
