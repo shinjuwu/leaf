@@ -118,11 +118,11 @@ func (p *NeooneProcessor) Route(msg interface{}, userData interface{}) error {
 	}
 	msgID := msgType.Elem().Name()
 	if msgID == "" {
-		msgMap := msg.(map[string]interface{})
-		if len(msgMap) != 1 {
+		msgMap := msg.(*map[string]interface{})
+		if len(*msgMap) != 1 {
 			return fmt.Errorf("invaild msg %v", msgMap)
 		}
-		for msgID, msg := range msgMap {
+		for msgID, msg := range *msgMap {
 			// json
 			msgType := reflect.TypeOf(msg)
 			if msgType == nil || msgType.Kind() != reflect.Ptr {
