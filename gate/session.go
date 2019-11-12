@@ -255,7 +255,7 @@ func (this *sessionagent) IsConnect(userId string) (bool, string) {
 	if this.AgentChanRPC == nil {
 		return false, "AgentChanRPC is nil"
 	}
-	result, err := this.AgentChanRPC.Call1("IsConnect", this.session.Sessionid, userId)
+	result, err := this.AgentChanRPC.Call1("IsConnect", userId)
 	if err != nil {
 		return false, err.Error()
 	}
