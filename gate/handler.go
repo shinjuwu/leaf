@@ -215,7 +215,7 @@ func (h *handler) Connect(a Agent) {
 		h.sessions.Set(a.GetSession().GetSessionid(), a)
 	}
 	if h.gate.GetSessionLearner() != nil {
-		h.gate.GetSessionLearner().Connect(a.GetSession())
+		h.gate.GetSessionLearner().Connect(a)
 	}
 }
 
@@ -224,6 +224,6 @@ func (h *handler) DisConnect(a Agent) {
 		h.sessions.Delete(a.GetSession().GetSessionid())
 	}
 	if h.gate.GetSessionLearner() != nil {
-		h.gate.GetSessionLearner().DisConnect(a.GetSession())
+		h.gate.GetSessionLearner().DisConnect(a)
 	}
 }

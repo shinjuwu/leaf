@@ -84,8 +84,8 @@ type StorageHandler interface {
 }
 
 type SessionLearner interface {
-	Connect(a Session)    //当连接建立  并且MQTT协议握手成功
-	DisConnect(a Session) //当连接关闭	或者客户端主动发送MQTT DisConnect命令
+	Connect(a Agent)    //当连接建立  并且MQTT协议握手成功
+	DisConnect(a Agent) //当连接关闭	或者客户端主动发送MQTT DisConnect命令
 }
 
 type AgentLearner interface {
