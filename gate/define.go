@@ -47,7 +47,7 @@ type Session interface {
 	SendNR(id string, data interface{}) string
 	SendBatch(Sessionids string, data interface{}) string //想该客户端的网关批量发送消息
 	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
-	IsConnect(Userid string) string
+	IsConnect(Userid string) (bool, string)
 	//是否是访客(未登录) ,默认判断规则为 userId==""代表访客
 	IsGuest() bool
 	//设置自动的访客判断函数,记得一定要在全局的时候设置这个值,以免部分模块因为未设置这个判断函数造成错误的判断

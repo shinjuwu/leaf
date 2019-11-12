@@ -251,15 +251,15 @@ func (this *sessionagent) SendBatch(Sessionids string, data interface{}) string 
 	return ""
 }
 
-func (this *sessionagent) IsConnect(userId string) string {
+func (this *sessionagent) IsConnect(userId string) (bool, string) {
 	if this.AgentChanRPC == nil {
-		return "AgentChanRPC is nil"
+		return false, "AgentChanRPC is nil"
 	}
-	_, err := this.AgentChanRPC.Call1("IsConnect", this.session.Sessionid, userId)
+	result, err := this.AgentChanRPC.Call1("IsConnect", this.session.Sessionid, userId)
 	if err != nil {
-		return err.Error()
+		return false, err.Error()
 	}
-	return ""
+	return result.(bool), ""
 }
 
 func (this *sessionagent) SendNR(id string, data interface{}) string {
