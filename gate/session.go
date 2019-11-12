@@ -297,3 +297,14 @@ func (this *sessionagent) IsGuest() bool {
 func (this *sessionagent) JudgeGuest(judgeGuest func(session Session) bool) {
 	this.judgeGuest = judgeGuest
 }
+
+func (this *sessionagent) CloseMultiSession(key string) string {
+	if this.AgentChanRPC == nil {
+		return "AgentChanRPC is nil"
+	}
+	err := this.AgentChanRPC.Call0("CloseMultiSession", key)
+	if err != nil {
+		return err.Error()
+	}
+	return ""
+}

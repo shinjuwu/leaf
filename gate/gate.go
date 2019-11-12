@@ -49,6 +49,7 @@ func (gate *Gate) OnInit() {
 	gate.AgentChanRPC.Register("BroadCast", gate.handler.BroadCast)
 	gate.AgentChanRPC.Register("IsConnect", gate.handler.IsConnect)
 	gate.AgentChanRPC.Register("Close", gate.handler.Close)
+	gate.AgentChanRPC.Register("CloseMultiSession", gate.handler.CloseMultiSession)
 }
 
 func (gate *Gate) Run(closeSig chan bool) {

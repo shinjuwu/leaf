@@ -201,6 +201,15 @@ func (h *handler) Close(args []interface{}) interface{} {
 	return ""
 }
 
+func (h *handler) CloseMultiSession(args []interface{}) interface{} {
+	key := args[0].(string)
+	if key == "" {
+		return "Invaild key"
+	}
+	h.gate.GetStorageHandler().CloseMultiSession(key)
+	return ""
+}
+
 func (h *handler) Connect(a Agent) {
 	if a.GetSession() != nil {
 		h.sessions.Set(a.GetSession().GetSessionid(), a)

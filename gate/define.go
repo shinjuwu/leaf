@@ -78,6 +78,8 @@ type StorageHandler interface {
 	可以用来延长Session信息过期时间
 	*/
 	Heartbeat(Userid string)
+	//剔除重複登入者
+	CloseMultiSession(Userid string)
 }
 
 type SessionLearner interface {
@@ -104,7 +106,8 @@ type GateHandler interface {
 	BroadCast(args []interface{}) interface{} //广播消息给网关所有在连客户端
 	//查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
 	IsConnect(args []interface{}) interface{}
-	Close(args []interface{}) interface{}  //主动关闭连接
-	Update(args []interface{}) interface{} //更新整个Session 通常是其他模块拉取最新数据
-	OnDestory()                            //退出事件,主动关闭所有的连接
+	Close(args []interface{}) interface{}             //主动关闭连接
+	Update(args []interface{}) interface{}            //更新整个Session 通常是其他模块拉取最新数据
+	OnDestory()                                       //退出事件,主动关闭所有的连接
+	CloseMultiSession(args []interface{}) interface{} //關閉重複登入的連線
 }
