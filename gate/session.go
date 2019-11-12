@@ -302,7 +302,7 @@ func (this *sessionagent) CloseMultiSession(key string) string {
 	if this.AgentChanRPC == nil {
 		return "AgentChanRPC is nil"
 	}
-	err := this.AgentChanRPC.Call0("CloseMultiSession", key)
+	_, err := this.AgentChanRPC.Call1("CloseMultiSession", key)
 	if err != nil {
 		return err.Error()
 	}
