@@ -53,6 +53,7 @@ type Session interface {
 	//设置自动的访客判断函数,记得一定要在全局的时候设置这个值,以免部分模块因为未设置这个判断函数造成错误的判断
 	JudgeGuest(judgeGuest func(session Session) bool)
 	Close() (err error)
+	CloseMultiSession(key string) string
 }
 
 /**
