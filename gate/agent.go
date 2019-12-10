@@ -16,6 +16,7 @@ type agent struct {
 	conn     network.Conn
 	gate     *Gate
 	userData interface{}
+	prob     interface{}
 	session  Session
 	isclose  bool
 }
@@ -99,6 +100,14 @@ func (a *agent) UserData() interface{} {
 
 func (a *agent) SetUserData(data interface{}) {
 	a.userData = data
+}
+
+func (a *agent) Prob() interface{} {
+	return a.prob
+}
+
+func (a *agent) SetProb(prob interface{}) {
+	a.prob = prob
 }
 
 func (a *agent) SetAgentID(id int64) {

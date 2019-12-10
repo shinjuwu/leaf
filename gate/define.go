@@ -13,6 +13,8 @@ type Agent interface {
 	Destroy()
 	UserData() interface{}
 	SetUserData(data interface{})
+	Prob() interface{}
+	SetProb(prob interface{})
 	GetSession() Session
 	SetAgentID(id int64)
 	GetAgentID() int64
